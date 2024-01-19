@@ -13979,12 +13979,13 @@ body {
     <div class="slide"></div>
     </div>
   <!-- partial -->
-
-<script>
+   <script>
     const slides = document.querySelectorAll(".slide");
     const auto = true;
     const intervalTime = 5000;
     let slideInterval;
+
+    let shuffleMode = false;
 
     const nextSlide = () => {
       const current = document.querySelector(".current");
@@ -13996,8 +13997,35 @@ body {
       }
     };
 
-    document.querySelector(".slider").addEventListener("click", () => {
-      nextSlide();
+    const shuffleSlides = () => {
+      const currentIndex = Array.from(slides).findIndex(slide => slide.classList.contains("current"));
+      slides.forEach(slide => slide.classList.remove("current"));
+
+      let randomIndex;
+      do {
+        randomIndex = Math.floor(Math.random() * slides.length);
+      } while (randomIndex === currentIndex);
+
+      slides[randomIndex].classList.add("current");
+    };
+
+    document.querySelector(".slider").addEventListener("click", (event) => {
+      const { clientX } = event;
+      const { width } = document.querySelector(".slider").getBoundingClientRect();
+
+      if (clientX > width / 2) {
+        // Clicked on the right side, go to next slide
+        nextSlide();
+      } else {
+        // Clicked on the left side, toggle shuffle mode
+        shuffleMode = !shuffleMode;
+
+        if (shuffleMode) {
+          // If in shuffle mode, shuffle slides
+          shuffleSlides();
+        }
+      }
+
       if (auto) {
         clearInterval(slideInterval);
         slideInterval = setInterval(nextSlide, intervalTime);
@@ -14008,7 +14036,6 @@ body {
       slideInterval = setInterval(nextSlide, intervalTime);
     }
   </script>
-
 </body>
 
 </html>
